@@ -1,86 +1,15 @@
 import pyxel
 
-SCREEN_WIDTH = 200
-SCREEN_HEIGHT = 150
-ENEMY_INTERVAL = 5
-START_SCENE = "start"
-PLAY_SCENE = "play"
+# 定数
+from constants import SCREEN_WIDTH, SCREEN_HEIGHT, ENEMY_INTERVAL, START_SCENE, PLAY_SCENE
 
-class Item:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def update(self):
-        if self.y < SCREEN_HEIGHT:
-            self.y += 1
-
-    def draw(self):
-        pyxel.blt(self.x, self.y, 0, 
-                  72, 0, 16, 16, pyxel.COLOR_WHITE)
-
-
-class Bullet:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def update(self):
-        self.y -= 5
-
-    def draw(self):
-        pyxel.rect(self.x, self.y, 2, 4, pyxel.COLOR_LIGHT_BLUE)
-
-
-class Explosion:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.timer = 6
-
-    def update(self):
-        self.timer -= 1
-
-    def draw(self):
-        if self.timer > 4:
-            pyxel.circ(self.x, self.y, 4, pyxel.COLOR_ORANGE)
-        elif self.timer > 2:
-            pyxel.circ(self.x, self.y, 3, pyxel.COLOR_RED)
-        else:
-            pyxel.circ(self.x, self.y, 2, pyxel.COLOR_YELLOW)
-
-
-class Heart:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def update(self):
-        if self.y < SCREEN_HEIGHT:
-            self.y += 1
-
-    def draw(self):
-        pyxel.blt(self.x, self.y, 0, 
-                  56, 0, 8, 8, pyxel.COLOR_BLACK)
-        
-
-class Enemy:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def update(self):
-        if self.y < SCREEN_HEIGHT:
-            self.y += 3
-
-    def draw(self):
-        pyxel.blt(self.x, self.y, 0, 
-                  88, 0, 16, 15, pyxel.COLOR_WHITE)
+# クラス
+from entities import Item, Bullet, Explosion, Heart, Enemy
 
 
 class App:
     def __init__(self):
-        pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, title="mokomokoゲーム")
+        pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, title="mokoゲーム")
         pyxel.mouse(True)
         pyxel.load("my_resource.pyxres")
         self.current_scene = START_SCENE
@@ -104,7 +33,7 @@ class App:
         self.enemy_collision = False
         self.heart_collision = False
         self.item_timer = 0
-        self.item_timer_max = 600
+        self.item_timer_max = 300
         self.shot_timer = 0
         self.heart_timer = 0
         self.collision_timer = 0
@@ -242,10 +171,8 @@ class App:
                     break
 
         #強化時間
-        if self.shot == True:
-            self.item_timer -= 1
-            if self.item_timer <= 0:
-                self.shot = False
+        if self.item_timer <= 0:
+            self.shot = False
 
         #敵撃破のエフェクト
         for explosion in self.explosions.copy():
@@ -283,7 +210,7 @@ class App:
             pyxel.rect(bar_x, bar_y, current_w, bar_h, pyxel.COLOR_RED)
 
             # 小数第2位までの残り時間（秒）を計算
-            remaining_sec = self.item_timer / 60
+            remaining_sec = self.item_timer / 30
             time_str = f"{remaining_sec:.2f}"  # 小数第2位まで
 
             # 数字の表示
