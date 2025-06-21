@@ -80,7 +80,7 @@ class Enemy:
 
 class App:
     def __init__(self):
-        pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, title="mokoゲーム")
+        pyxel.init(SCREEN_WIDTH, SCREEN_HEIGHT, title="mokomokoゲーム")
         pyxel.mouse(True)
         pyxel.load("my_resource.pyxres")
         self.current_scene = START_SCENE
