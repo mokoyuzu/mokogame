@@ -56,18 +56,5 @@ class Heart:
 
     def draw(self):
         pyxel.blt(self.x, self.y, 0, 
-                  56, 0, 8, 8, pyxel.COLOR_BLACK)
+                  55, 0, 10, 10, pyxel.COLOR_PURPLE)
         
-
-class Enemy:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def update(self):
-        if self.y < SCREEN_HEIGHT:
-            self.y += 3
-
-    def draw(self):
-        pyxel.blt(self.x, self.y, 0, 
-                  88, 0, 16, 15, pyxel.COLOR_WHITE)

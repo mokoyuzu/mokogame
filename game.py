@@ -4,7 +4,9 @@ import pyxel
 from constants import SCREEN_WIDTH, SCREEN_HEIGHT, ENEMY_INTERVAL, START_SCENE, PLAY_SCENE
 
 # クラス
-from entities import Item, Bullet, Explosion, Heart, Enemy
+from entities import Item, Bullet, Explosion, Heart
+from enemy import Enemy
+from enemy_type import get_enemy_type_by_stage
 
 
 class App:
@@ -34,9 +36,11 @@ class App:
         self.heart_collision = False
         self.item_timer = 0
         self.item_timer_max = 300
-        self.shot_timer = 0
         self.heart_timer = 0
         self.collision_timer = 0
+        self.stage = 1
+        self.stage_timer = 0
+        self.stage_duration = 1800
 
 
     def update_start_scene(self):
@@ -46,6 +50,11 @@ class App:
 
 
     def update_play_scene(self):
+        #ステージのカウント
+        self.stage_timer += 1
+        if self.stage_timer > self.stage_duration:
+            self.stage += 1
+            self.stage_timer = 0
 
         #無敵時間のカウント
         if self.collision_timer > 0:
@@ -66,7 +75,8 @@ class App:
 
         #敵の追加
         if pyxel.frame_count % ENEMY_INTERVAL == 0:
-            self.enemies.append(Enemy(pyxel.rndi(0, SCREEN_WIDTH - 8), 0))
+            enemy_type = get_enemy_type_by_stage(self.stage)
+            self.enemies.append(Enemy(pyxel.rndi(0, SCREEN_WIDTH - 8), 0, enemy_type))
 
         #敵の移動
         for enemy in self.enemies.copy():
@@ -193,6 +203,9 @@ class App:
         pyxel.rect(0, SCREEN_HEIGHT * 9 / 10, SCREEN_WIDTH, 
                    SCREEN_HEIGHT * 1 / 5
                    , pyxel.COLOR_BROWN)
+        
+        #ステージ切り替え
+        pyxel.text(165, 5, f"Stage: {self.stage}", pyxel.COLOR_WHITE)
 
         #強化アイテム
         for item in self.items:
@@ -260,17 +273,17 @@ class App:
         #HPの消えるエフェクト    
         if 28 < self.collision_timer < 30:
             pyxel.blt(hp_x * 10 + 15, 5, 0, 
-                      48, 0, 8, 16, pyxel.COLOR_BLACK)
+                      48, 0, 7, 16, pyxel.COLOR_BLACK)
         if 26 < self.collision_timer <= 28:
             pyxel.blt(hp_x * 10 + 15, 5, 0, 
                       40, 0, 8, 16, pyxel.COLOR_BLACK)
-            
+        #HP回復エフェクト    
         if 0 < self.heart_timer < 2 or 4 < self.heart_timer < 6:
             pyxel.blt(hp_x * 10 + 5, 5, 0, 
-                      64, 0, 8, 8, pyxel.COLOR_BLACK)
+                      65, 0, 8, 8, pyxel.COLOR_BLACK)
         if 2 <= self.heart_timer < 4 or 6 <= self.heart_timer < 8:
             pyxel.blt(hp_x * 10 + 5, 5, 0, 
-                      64, 8, 8, 8, pyxel.COLOR_BLACK)
+                      65, 0, 8, 8, pyxel.COLOR_BLACK)
 
 
         #スコア表示

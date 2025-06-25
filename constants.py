@@ -3,4 +3,6 @@ SCREEN_HEIGHT = 150
 ENEMY_INTERVAL = 5
 
 START_SCENE = "start"
+STAGE_CLEAR_SCENE = "stage_clear"
+STAGE_START_SCENE = "stage_start"
 PLAY_SCENE = "play"
