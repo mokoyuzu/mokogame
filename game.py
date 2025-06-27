@@ -120,11 +120,10 @@ class App:
                 heart.y < self.player_y + 8 < heart.y + 8
                 ):
 
-                
-                    self.hp += 1
-                    pyxel.play(0, 0) 
-                    self.hearts.remove(heart)
-                    self.heart_timer = 8
+                self.hp += 1
+                pyxel.play(0, 0) 
+                self.hearts.remove(heart)
+                self.heart_timer = 8
                     
             #画面外に出たハートの削除
             if heart.y >= SCREEN_HEIGHT:
@@ -159,7 +158,17 @@ class App:
         if self.shot and pyxel.btn(pyxel.KEY_SPACE):
             if pyxel.frame_count % 2 < 1:
                pyxel.play(0, 3)
-               self.bullets.append(Bullet(self.player_x + 7, self.player_y))
+               self.bullets.append(Bullet(self.player_x + 7, self.player_y, 0, 5))
+               self.bullets.append(Bullet(self.player_x + 7, self.player_y, -2, 5))
+               self.bullets.append(Bullet(self.player_x + 7, self.player_y, 2, 5))
+
+        elif not self.shot and pyxel.btnp(pyxel.KEY_SPACE) and self.shot_interval == 0:
+           pyxel.play(0, 3)
+           self.bullets.append(Bullet(self.player_x + 7, self.player_y, 0, 5))
+           self.shot_interval = 5
+        
+        elif self.shot_interval != 0:
+            self.shot_interval -= 1
 
         #弾の追加
         for bullet in self.bullets.copy():

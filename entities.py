@@ -16,12 +16,15 @@ class Item:
 
 
 class Bullet:
-    def __init__(self, x, y):
+    def __init__(self, x, y, dx, dy):
         self.x = x
         self.y = y
+        self.dx = dx
+        self.dy = dy
 
     def update(self):
-        self.y -= 5
+        self.y -= self.dy
+        self.x += self.dx
 
     def draw(self):
         pyxel.rect(self.x, self.y, 2, 4, pyxel.COLOR_LIGHT_BLUE)
