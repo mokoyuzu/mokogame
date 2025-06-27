@@ -55,6 +55,7 @@ class App:
         if self.stage_timer > self.stage_duration:
             self.stage += 1
             self.stage_timer = 0
+            
 
         #無敵時間のカウント
         if self.collision_timer > 0:
@@ -74,7 +75,7 @@ class App:
             self.player_x -= 2
 
         #敵の追加
-        if pyxel.frame_count % ENEMY_INTERVAL == 0:
+        if pyxel.frame_count % int(ENEMY_INTERVAL / self.stage + self.stage / 2) == 0:
             enemy_type = get_enemy_type_by_stage(self.stage)
             self.enemies.append(Enemy(pyxel.rndi(0, SCREEN_WIDTH - 8), 0, enemy_type))
 
@@ -104,7 +105,7 @@ class App:
 
         #ハートの追加
         if pyxel.frame_count % ENEMY_INTERVAL == 0:
-            if pyxel.rndi(0,100) == 0:
+            if pyxel.rndi(0,75) == 0:
                 self.hearts.append(Heart(pyxel.rndi(0, SCREEN_WIDTH - 8), 0))
 
         if self.heart_timer > 0:
@@ -119,7 +120,7 @@ class App:
                 heart.y < self.player_y + 8 < heart.y + 8
                 ):
 
-                if self.hp < 3:
+                
                     self.hp += 1
                     pyxel.play(0, 0) 
                     self.hearts.remove(heart)
@@ -206,6 +207,9 @@ class App:
         
         #ステージ切り替え
         pyxel.text(165, 5, f"Stage: {self.stage}", pyxel.COLOR_WHITE)
+        if 0 <= self.stage_timer <= 90:
+            pyxel.text(SCREEN_WIDTH / 2 - 15, SCREEN_HEIGHT / 2 - 7, 
+                       f"STAGE {self.stage}", pyxel.COLOR_WHITE)
 
         #強化アイテム
         for item in self.items:

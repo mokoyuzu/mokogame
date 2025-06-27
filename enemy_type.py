@@ -5,5 +5,5 @@ def get_enemy_type_by_stage(stage):
         return "normal"
     elif stage == 2:
         return random.choice(["normal", "fast"])
-    elif stage <= 3:
+    elif stage >= 3:
         return random.choice(["normal", "fast", "zig"])

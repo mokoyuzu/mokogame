@@ -9,6 +9,7 @@ class Enemy:
         self.type = enemy_type
 
     def update(self):
+
         if self.y < SCREEN_HEIGHT:
             if self.type == "normal":
                 self.y += 2
