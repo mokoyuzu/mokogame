@@ -25,7 +25,7 @@ class App:
         self.score = 0
         self.items = []
         self.bullets = []
-        self.shot_interval = 5
+        self.shot_interval = 0
         self.shot_timer = 0
         self.explosions = []
         self.hearts = []
@@ -40,7 +40,7 @@ class App:
         self.collision_timer = 0
         self.stage = 1
         self.stage_timer = 0
-        self.stage_duration = 1800
+        self.stage_duration = 600
 
 
     def update_start_scene(self):
@@ -105,7 +105,7 @@ class App:
 
         #ハートの追加
         if pyxel.frame_count % ENEMY_INTERVAL == 0:
-            if pyxel.rndi(0,75) == 0:
+            if pyxel.rndi(0,150) == 0:
                 self.hearts.append(Heart(pyxel.rndi(0, SCREEN_WIDTH - 8), 0))
 
         if self.heart_timer > 0:
@@ -131,7 +131,7 @@ class App:
                 
         #強化アイテムの追加
         if pyxel.frame_count % ENEMY_INTERVAL == 0:
-            if pyxel.rndi(0,150) == 0:
+            if pyxel.rndi(0,180) == 0:
                 self.items.append(Item(pyxel.rndi(0, SCREEN_WIDTH - 8), 0))
 
         if self.item_timer > 0:
@@ -165,7 +165,7 @@ class App:
         elif not self.shot and pyxel.btnp(pyxel.KEY_SPACE) and self.shot_interval == 0:
            pyxel.play(0, 3)
            self.bullets.append(Bullet(self.player_x + 7, self.player_y, 0, 5))
-           self.shot_interval = 5
+           self.shot_interval = 10
         
         elif self.shot_interval != 0:
             self.shot_interval -= 1
@@ -217,8 +217,15 @@ class App:
         #ステージ切り替え
         pyxel.text(165, 5, f"Stage: {self.stage}", pyxel.COLOR_WHITE)
         if 0 <= self.stage_timer <= 90:
-            pyxel.text(SCREEN_WIDTH / 2 - 15, SCREEN_HEIGHT / 2 - 7, 
+            pyxel.text(SCREEN_WIDTH / 2 - 15, 60, 
                        f"STAGE {self.stage}", pyxel.COLOR_WHITE)
+        
+        if self.stage_timer >= 300:
+            remaining_sec_stage = self.stage_duration / 30 - self.stage_timer / 30
+            time_str_stage = f"{remaining_sec_stage:.2f}"
+            text_x_stage = 19.75 + (162.25 - len(time_str_stage) * 4) // 2
+            pyxel.text(SCREEN_WIDTH / 2 - 20, 50, "Next Stage",pyxel.COLOR_WHITE)
+            pyxel.text(text_x_stage, 60, time_str_stage, pyxel.COLOR_WHITE)
 
         #強化アイテム
         for item in self.items:
@@ -243,6 +250,8 @@ class App:
             text_x = bar_x + (bar_w - len(time_str) * 4) // 2
             text_y = bar_y + 6
             pyxel.text(text_x, text_y, time_str, pyxel.COLOR_WHITE)
+
+
 
         #弾
         for bullet in self.bullets:
