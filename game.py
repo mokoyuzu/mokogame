@@ -5,7 +5,7 @@ from constants import SCREEN_WIDTH, SCREEN_HEIGHT, ENEMY_INTERVAL, START_SCENE, 
 
 # クラス
 from entities import Item, Bullet, Explosion, Heart
-from enemy import Enemy
+from enemy import Enemy, Boss
 from enemy_type import get_enemy_type_by_stage
 
 
@@ -40,8 +40,10 @@ class App:
         self.collision_timer = 0
         self.stage = 1
         self.stage_timer = 0
-        self.stage_duration = 600
-
+        self.stage_duration = 1800
+        self.boss = None
+        self.boss_spawned = False
+        
 
     def update_start_scene(self):
         if pyxel.btnp(pyxel.KEY_RETURN):
@@ -54,7 +56,10 @@ class App:
         self.stage_timer += 1
         if self.stage_timer > self.stage_duration:
             self.stage += 1
-            self.stage_timer = 0
+            if self.stage < 4:
+                self.stage_timer = 0
+            elif self.stage == 4:
+                self.stage_timer = -100000000
             
 
         #無敵時間のカウント
@@ -74,10 +79,24 @@ class App:
         elif pyxel.btn(pyxel.KEY_LEFT) and self.player_x > 0:
             self.player_x -= 2
 
+        #ボスの追加
+        if self.stage == 4 and not self.boss_spawned:
+            self.boss = Boss(SCREEN_WIDTH // 2 - 24, 0)
+            self.boss_spawned = True
+        if self.boss_spawned:
+            self.boss.update()
+
+            
+            if self.boss and self.boss.hp <= 0:
+                self.boss = None
+                self.boss_spawned = False
+                self.stage = 1
+
         #敵の追加
-        if pyxel.frame_count % int(ENEMY_INTERVAL / self.stage + self.stage / 2) == 0:
-            enemy_type = get_enemy_type_by_stage(self.stage)
-            self.enemies.append(Enemy(pyxel.rndi(0, SCREEN_WIDTH - 8), 0, enemy_type))
+        if self.stage <= 3:
+            if pyxel.frame_count % int(ENEMY_INTERVAL / self.stage + self.stage / 2) == 0:
+                enemy_type = get_enemy_type_by_stage(self.stage)
+                self.enemies.append(Enemy(pyxel.rndi(0, SCREEN_WIDTH - 8), 0, enemy_type))
 
         #敵の移動
         for enemy in self.enemies.copy():
@@ -95,12 +114,26 @@ class App:
                     pyxel.play(0, 1) 
                     self.explosions.append(Explosion(enemy.x + 8, enemy.y + 8))
                     self.enemies.remove(enemy)
-                
-
             #画面外に出た敵の削除
             if enemy.y >= SCREEN_HEIGHT:
                 self.enemies.remove(enemy)
                 self.score += 50
+
+        if self.boss:
+            for bullet in self.boss.bullets.copy():
+                if self.enemy_collision == False:
+                    if (bullet.x <= self.player_x + 7 <= bullet.x + 1 and
+                        bullet.y <= self.player_y + 8 <= bullet.y + 1):
+                        self.boss.bullets.remove(bullet)
+                        self.hp -= 1
+                        self.enemy_collision = True
+                        self.collision_timer = 30
+                        pyxel.play(0, 1) 
+                        break  # 多重ヒット防止
+
+                
+
+            
 
 
         #ハートの追加
@@ -190,6 +223,20 @@ class App:
                     self.score += 200
                     break
 
+            if self.boss:
+                if (self.boss.x < bullet.x < self.boss.x + 40 and
+                    self.boss.y - 10 < bullet.y < self.boss.y + 10):
+                    self.boss.hp -= 1
+                    self.bullets.remove(bullet)
+                    pyxel.play(0, 2)
+                    break
+            
+                
+
+                    
+                    
+
+                        
         #強化時間
         if self.item_timer <= 0:
             self.shot = False
@@ -266,9 +313,16 @@ class App:
         for heart in self.hearts:
             heart.draw()
 
+        #ボス
+        if self.boss_spawned:
+            self.boss.draw()
+            pyxel.rect(50, 3, self.boss.hp * 2, 5, 8)  # HPバー
+            pyxel.rectb(50, 3, 100, 5, 7)
+
         #敵
         for enemy in self.enemies:
             enemy.draw()
+            
 
         #GAMEOVER画面
         if self.hp == 0:

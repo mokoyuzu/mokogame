@@ -29,25 +29,32 @@ class Boss:
         self.y = y
         self.hp = 50
         self.bullets = []
-        self.shoot_interval = 10
+        self.shoot_interval = 5
         self.shoot_timer = 0
 
     def update(self):
-        self.y += 0.1
 
         self.shoot_timer += 1
         if self.shoot_timer >= self.shoot_interval:
             self.shoot_timer = 0
 
-            for _ in range (5):
+            for _ in range (15):
                 bullet_x = pyxel.rndi(0, SCREEN_WIDTH - 1)
-                self.bullets.append(BossBullet(bullet_x, self.y + 32))
+                if bullet_x % 2 == 0:
+                    self.bullets.append(BossBullet(bullet_x, self.y + 17))
 
-            for bullet in self.bullets:
-                bullet.update()
+        for bullet in self.bullets:
+            bullet.update()
 
             if bullet.y >= SCREEN_HEIGHT:
                 self.bullets.remove(bullet)
+
+    def draw(self):
+        pyxel.blt(self.x, self.y, 0,
+                  104, -10, 49, 50, pyxel.COLOR_BLACK)
+        
+        for bullet in self.bullets:
+            bullet.draw()
 
 class BossBullet:
     def __init__(self, x, y):
@@ -58,5 +65,5 @@ class BossBullet:
         self.y += 2
 
     def draw(self):
-        pyxel.rect(self.x, self.y, 1, 2, 
-                   pyxel.COLOR_RED)
+        pyxel.rect(self.x, self.y, 1, 7, 
+                   pyxel.COLOR_WHITE)
